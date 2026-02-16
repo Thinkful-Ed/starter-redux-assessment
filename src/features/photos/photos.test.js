@@ -33,30 +33,32 @@ test('removes a dog from the list of dogs after clicking the Delete button', asy
   expect(screen.queryByText(/basenji/i)).not.toBeInTheDocument();
 });
 
-test('Task 22 & 27 & 29: toggles a photo as favorite when the favorite button is clicked', async () => {
+test('toggles favorite button text from "Favorite" to "Favorited"', async () => {
   render(<App />);
 
   // Find the first dog photo (Bullterrier Staffordshire - id: 1)
   const favoriteButton = screen.getByTestId('1-favorite-button');
   
-  // Initially should not have the favorite class/indicator
-  expect(favoriteButton).toBeInTheDocument();
+  // Initially button should show "Favorite" text
+  expect(favoriteButton).toHaveTextContent(/favorite/i);
+  expect(favoriteButton).not.toHaveTextContent(/favorited/i);
   
   // Click to add to favorites
   await userEvent.click(favoriteButton);
   
-  // The button should show it's now favorited (implementation depends on student)
-  // For example, button text might change or have an active state
-  // This test verifies the favorite button exists and is clickable
-  expect(favoriteButton).toBeInTheDocument();
+  // After click, button should show "Favorited" text
+  expect(favoriteButton).toHaveTextContent(/favorited/i);
+  expect(favoriteButton).not.toHaveTextContent(/^favorite$/i);
   
   // Click again to remove from favorites
   await userEvent.click(favoriteButton);
   
-  expect(favoriteButton).toBeInTheDocument();
+  // Button should revert to "Favorite" text
+  expect(favoriteButton).toHaveTextContent(/favorite/i);
+  expect(favoriteButton).not.toHaveTextContent(/favorited/i);
 });
 
-test('Task 23 & 28 & 30: edits a photo caption when the edit button is clicked', async () => {
+test('updates photo caption when valid input is provided', async () => {
   // Mock window.prompt to return a new caption
   global.prompt = jest.fn(() => 'Updated Bullterrier Caption');
   
@@ -65,10 +67,14 @@ test('Task 23 & 28 & 30: edits a photo caption when the edit button is clicked',
   // Find the first dog photo
   const editButton = screen.getByTestId('1-edit-button');
   
+  // Verify original caption is present
   expect(screen.getByText(/bullterrier staffordshire/i)).toBeInTheDocument();
   
   // Click the edit button
   await userEvent.click(editButton);
+  
+  // Verify prompt was called
+  expect(global.prompt).toHaveBeenCalled();
   
   // After editing, the new caption should appear
   expect(screen.getByText(/updated bullterrier caption/i)).toBeInTheDocument();
@@ -77,5 +83,55 @@ test('Task 23 & 28 & 30: edits a photo caption when the edit button is clicked',
   expect(screen.queryByText(/bullterrier staffordshire/i)).not.toBeInTheDocument();
   
   // Clean up
-  global.prompt.mockClear();
+  jest.restoreAllMocks();
+});
+
+test('keeps original caption when user cancels edit prompt', async () => {
+  // Mock window.prompt to return null (user cancels)
+  global.prompt = jest.fn(() => null);
+  
+  render(<App />);
+
+  // Find the first dog photo
+  const editButton = screen.getByTestId('1-edit-button');
+  
+  // Verify original caption is present
+  expect(screen.getByText(/bullterrier staffordshire/i)).toBeInTheDocument();
+  
+  // Click the edit button
+  await userEvent.click(editButton);
+  
+  // Verify prompt was called
+  expect(global.prompt).toHaveBeenCalled();
+  
+  // Original caption should still be visible (not changed)
+  expect(screen.getByText(/bullterrier staffordshire/i)).toBeInTheDocument();
+  
+  // Clean up
+  jest.restoreAllMocks();
+});
+
+test('rejects empty or whitespace-only caption input', async () => {
+  // Mock window.prompt to return empty string
+  global.prompt = jest.fn(() => '   ');
+  
+  render(<App />);
+
+  // Find the first dog photo
+  const editButton = screen.getByTestId('1-edit-button');
+  
+  // Verify original caption is present
+  expect(screen.getByText(/bullterrier staffordshire/i)).toBeInTheDocument();
+  
+  // Click the edit button
+  await userEvent.click(editButton);
+  
+  // Verify prompt was called
+  expect(global.prompt).toHaveBeenCalled();
+  
+  // Original caption should still be visible (not changed)
+  expect(screen.getByText(/bullterrier staffordshire/i)).toBeInTheDocument();
+  
+  // Clean up
+  jest.restoreAllMocks();
 });

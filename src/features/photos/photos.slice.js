@@ -19,15 +19,16 @@ const options = {
     // Task 22: Create a `toggleFavorite()` case reducer that toggles the isFavorite property of a photo
     // Task 22 Hint: Find the photo by id in state.photos and toggle its isFavorite boolean value
     // The action payload will contain the id of the photo to toggle
-    // Task 23: Create an `editPhotoCaption()` case reducer that updates the caption of a photo
-    // Task 23 Hint: Find the photo by id in state.photos and update its caption property
+
+    // Task 26: Create an `editPhotoCaption()` case reducer that updates the caption of a photo
+    // Task 26 Hint: Find the photo by id in state.photos and update its caption property
     // The action payload will contain an object with { id, newCaption }
   },
 };
 
 const photosSlice = createSlice(options);
 
-// Task 22 & 23: Export the `toggleFavorite()` and `editPhotoCaption()` action creators once you implement their reducers above
+// Task 22 & 26: Export the `toggleFavorite()` and `editPhotoCaption()` action creators once you implement their reducers above
 export const { addPhoto, removePhoto } = photosSlice.actions;
 
 export default photosSlice.reducer;
@@ -36,6 +37,3 @@ export const selectAllPhotos = (state) => state.photos.photos;
 export const selectFilteredPhotos = (state) => {
   // Task 12: Complete `selectFilteredPhotos()` selector to return a filtered list of photos whose captions match the user's search term
 };
-
-// Task 24: Create a `selectFavoritedPhotos()` selector that returns only the photos where isFavorite is true
-// This selector should follow the same pattern as selectAllPhotos
